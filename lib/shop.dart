@@ -14,6 +14,12 @@ class ShopState extends State<Shop> {
     });
   }
 
+  void _removeItem(index) {
+    setState(() {
+      _items.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -49,6 +55,16 @@ class ShopState extends State<Shop> {
   Widget _buildItem(String text, int index) {
     return ListTile(
       title: Text(text),
+
+      trailing: IconButton(
+        icon: Icon(Icons.delete),
+        onPressed: () {
+          _removeItem(index);
+        },
+      ),
+      /*onTap: () {
+        _removeItem(index);
+      },*/
     );
   }
 
