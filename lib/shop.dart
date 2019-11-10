@@ -7,8 +7,8 @@ class Shop extends StatefulWidget {
 
 class ShopState extends State<Shop> {
   List<String> _items = [
-    'item1',
-    'item2',
+    'Eggs',
+    'Apples',
   ];
 
   @override
@@ -19,16 +19,60 @@ class ShopState extends State<Shop> {
         title: Text('Shopping List'),
       ),
 
-      body: ListView.builder(
-          itemBuilder: (context, index) {
+      body: _buildList(),
 
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        tooltip: "Add item",
+        onPressed: () {
+          _pushAddItemScreen();
+        },
+      ),
+    );
+  }
+
+  Widget _buildList() {
+    return ListView.builder(
+        itemBuilder: (context, index) {
+          if (index < _items.length) {
             var item = _items[index];
 
-            return ListTile(
-              title: Text(item),
-            );
-          },
-      ),
+            return _buildItem(item, index);
+          }
+        }
+    );
+  }
+
+  Widget _buildItem(String text, int index) {
+    return ListTile(
+      title: Text(text),
+    );
+  }
+
+  void _pushAddItemScreen() {
+    Navigator.of(context).push(
+        MaterialPageRoute(
+            builder: (context) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text('Add an item'),
+                ),
+
+                body: TextField(
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'e.g. Eggs',
+                    contentPadding: EdgeInsets.all(16)
+                  ),
+
+                  onSubmitted: (value) {
+                    debugPrint(value);
+                    
+                  },
+                ),
+              );
+            }
+        )
     );
   }
 }
