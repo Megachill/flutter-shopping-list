@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Shop extends StatefulWidget {
   @override
@@ -6,7 +8,11 @@ class Shop extends StatefulWidget {
 }
 
 class ShopState extends State<Shop> {
+  Future<SharedPreferences> _sprefs = SharedPreferences.getInstance();
+
   List<String> _items = [];
+
+  var txt = TextEditingController();
 
   void _addItem(value) {
     setState(() {
@@ -14,9 +20,27 @@ class ShopState extends State<Shop> {
     });
   }
 
+  void _editItem(index, value) {
+    setState(() {
+      _items[index] = value;
+    });
+  }
+  
   void _removeItem(index) {
     setState(() {
       _items.removeAt(index);
+    });
+  }
+
+  @override
+
+  Future<Null> getData() async {
+    final SharedPreferences prefs = await _sprefs;
+    String data = prefs.getString('_ricoshopitems');
+    this.setState(() {
+//      _items = data;
+//    todo
+      
     });
   }
 
@@ -25,7 +49,7 @@ class ShopState extends State<Shop> {
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text('Shopping List'),
+        title: Text('Ricos Shopping List'),
       ),
 
       body: _buildList(),
@@ -34,6 +58,8 @@ class ShopState extends State<Shop> {
         child: Icon(Icons.add),
         tooltip: "Add item",
         onPressed: () {
+          // clear out txt buffer before entering new screen
+          txt.value = new TextEditingValue();
           _pushAddItemScreen();
         },
       ),
@@ -41,6 +67,16 @@ class ShopState extends State<Shop> {
   }
 
   Widget _buildList() {
+    if (_items.length < 1) {
+      return Center(
+        child: Text("Nothing to see yet...",
+        style: TextStyle(
+            fontSize: 20,
+          ),
+        ),
+      );
+    }
+
     return ListView.builder(
         itemBuilder: (context, index) {
           if (index < _items.length) {
@@ -62,12 +98,14 @@ class ShopState extends State<Shop> {
           _removeItem(index);
         },
       ),
-      /*onTap: () {
-        _removeItem(index);
-      },*/
+      onTap: () {
+        txt.value = new TextEditingController.fromValue(new TextEditingValue(text: _items[index])).value;
+        _pushEditItemScreen(index);
+      },
     );
   }
 
+  /// opens add new item screen
   void _pushAddItemScreen() {
     Navigator.of(context).push(
         MaterialPageRoute(
@@ -84,6 +122,8 @@ class ShopState extends State<Shop> {
                     contentPadding: EdgeInsets.all(16)
                   ),
 
+                  controller: txt,
+
                   onSubmitted: (value) {
 //                    debugPrint(value);
                     // add the item
@@ -99,6 +139,38 @@ class ShopState extends State<Shop> {
               );
             }
         )
+    );
+  }
+  
+  /// opens edit item screen
+  void _pushEditItemScreen (index) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Edit item..'),
+            ),
+            
+            body: TextField(
+              autofocus: true,
+
+              decoration: InputDecoration(
+                  hintText: 'e.g. Eggs',
+                  contentPadding: EdgeInsets.all(16)
+              ),
+
+              controller: txt,
+              
+              onSubmitted: (value) {
+                _editItem(index, value);
+
+                Navigator.pop(context);
+              },
+            ),
+          );
+        }
+      )
     );
   }
 }
