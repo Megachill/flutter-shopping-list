@@ -6,10 +6,13 @@ class Shop extends StatefulWidget {
 }
 
 class ShopState extends State<Shop> {
-  List<String> _items = [
-    'Eggs',
-    'Apples',
-  ];
+  List<String> _items = [];
+
+  void _addItem(value) {
+    setState(() {
+      _items.add(value);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +69,15 @@ class ShopState extends State<Shop> {
                   ),
 
                   onSubmitted: (value) {
-                    debugPrint(value);
-                    
+//                    debugPrint(value);
+                    // add the item
+                    _addItem(value);
+
+                    // close route
+                    // when push is used, it pushes new item on stack of navigator
+                    // simply pop off stack and it goes back
+                    Navigator.pop(context);
+
                   },
                 ),
               );
